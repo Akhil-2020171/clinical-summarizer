@@ -1,4 +1,5 @@
 import os
+import re
 
 import requests
 
@@ -78,6 +79,9 @@ class ClinicalSummarizer:
         response.raise_for_status()
 
         text = response.json()["choices"][0]["message"]["content"].strip()
+        # Small models sometimes drop the space after a comma ("Abdomen,and").
+        text = re.sub(r",(?=[A-Za-z])", ", ", text)
+        text = re.sub(r"(?<=[A-Za-z])\(", " (", text)  # "Count(CBC)" -> "Count (CBC)"
         if not text:
             raise RuntimeError("The summarizer returned an empty response.")
         return text

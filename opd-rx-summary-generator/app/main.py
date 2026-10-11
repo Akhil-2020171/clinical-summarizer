@@ -2,7 +2,7 @@ import logging
 import os
 import re
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 from app.schemas.request import OPDPrescriptionRequest
 from app.schemas.response import (
@@ -47,6 +47,12 @@ ENABLE_QWEN_SUMMARIZER = (
     in {"1", "true", "yes", "on"}
 )
 
+# Development aid: also log the text the model wrote when it is rejected.
+# Off by default because the text contains patient information.
+LOG_REJECTED_TEXT = (
+    os.getenv("LOG_REJECTED_TEXT", "false").strip().lower() in {"1", "true", "yes", "on"}
+)
+
 _summarizer: ClinicalSummarizer | None = None
 
 
@@ -72,13 +78,20 @@ def get_summarizer() -> ClinicalSummarizer:
 
 def generate_summary(
     request: OPDPrescriptionRequest,
-) -> str:
-    """LLM summary, validated; falls back to a template summary."""
+) -> tuple[str, str]:
+    """Return (summary, source).
+
+    source is one of: "llm", "template:disabled", "template:no-facts",
+    "template:rejected", "template:error".
+    """
     facts = build_brief_facts(request)
     fallback = facts.to_template_summary()
 
-    if not ENABLE_QWEN_SUMMARIZER or facts.is_empty():
-        return fallback
+    if not ENABLE_QWEN_SUMMARIZER:
+        return fallback, "template:disabled"
+
+    if facts.is_empty():
+        return fallback, "template:no-facts"
 
     try:
         candidate = get_summarizer().summarize(facts.to_prompt())
@@ -86,17 +99,19 @@ def generate_summary(
 
         if not problems:
             logger.info("LLM summary accepted.")
-            return candidate
+            return candidate, "llm"
 
         logger.warning("LLM summary rejected: %s", problems)
+        if LOG_REJECTED_TEXT:
+            logger.warning("Rejected text: %s", candidate)
+        return fallback, "template:rejected"
 
     except Exception as exc:
         logger.warning(
             "LLM generation failed (%s); using template summary.",
             type(exc).__name__,
         )
-
-    return fallback
+        return fallback, "template:error"
 
 
 def build_sections(
@@ -325,8 +340,10 @@ def health_check():
 )
 def summarize_prescription(
     request: OPDPrescriptionRequest,
+    response: Response,
 ) -> OPDPrescriptionResponse:
-    summary = generate_summary(request)
+    summary, source = generate_summary(request)
+    response.headers["X-Summary-Source"] = source
     sections = build_sections(request)
 
     return OPDPrescriptionResponse(

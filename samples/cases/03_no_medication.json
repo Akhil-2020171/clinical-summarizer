@@ -1,0 +1,24 @@
+{
+  "CC": [
+    {
+      "RN": "Knee pain",
+      "DU": "2 weeks"
+    }
+  ],
+  "DIAG": {
+    "DG": [
+      {
+        "Name": "Osteoarthritis"
+      }
+    ]
+  },
+  "INV": [
+    {
+      "TN": "X-ray knee joint"
+    }
+  ],
+  "strtreatmentAdvice": "Physiotherapy and weight reduction.",
+  "pat_Name": "Test NoMeds",
+  "patGender": "M",
+  "patAge": "55 Yr"
+}

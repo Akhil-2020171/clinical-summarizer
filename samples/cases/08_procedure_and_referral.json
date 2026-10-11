@@ -1,0 +1,49 @@
+{
+  "CC": [
+    {
+      "RN": "Chest pain",
+      "DU": "2 days"
+    }
+  ],
+  "DIAG": {
+    "DG": [
+      {
+        "Name": "Chest pain under evaluation"
+      }
+    ]
+  },
+  "INV": [
+    {
+      "TN": "Troponin I"
+    },
+    {
+      "TN": "Lipid profile"
+    }
+  ],
+  "DRUG": [
+    {
+      "DRN": "ASPIRIN TAB 75MG [ 601 ]",
+      "DSN": "75 mg",
+      "FRQ": "OD"
+    },
+    {
+      "DRN": "ATORVASTATIN TAB 10MG [ 602 ]",
+      "DSN": "10 mg",
+      "FRQ": "HS"
+    }
+  ],
+  "clinicalproc": [
+    {
+      "procname": "ECG "
+    }
+  ],
+  "strReferal": [
+    {
+      "referdeptname": "Cardiology",
+      "referreason": "Chest pain evaluation"
+    }
+  ],
+  "pat_Name": "Test Referral",
+  "patGender": "F",
+  "patAge": "45 Yr"
+}

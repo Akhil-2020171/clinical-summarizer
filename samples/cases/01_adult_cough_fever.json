@@ -1,0 +1,52 @@
+{
+  "CC": [
+    {
+      "RN": "Cough",
+      "DU": "5 days"
+    },
+    {
+      "RN": "Fever",
+      "DU": "3 days"
+    }
+  ],
+  "DIAG": {
+    "DG": [
+      {
+        "Name": "Acute bronchitis"
+      }
+    ]
+  },
+  "INV": [
+    {
+      "TN": "Chest X-ray"
+    }
+  ],
+  "DRUG": [
+    {
+      "DRN": "AZITHROMYCIN TAB 500MG [ 101 ]",
+      "DSN": "500 mg",
+      "FRQ": "OD",
+      "DYS": "3"
+    },
+    {
+      "DRN": "PARACETAMOL TAB 650MG [ 102 ]",
+      "DSN": "650 mg",
+      "FRQ": "SOS"
+    }
+  ],
+  "FUP": [
+    {
+      "NOTE": "Review with X-ray report.",
+      "DATE": "20-10-2026"
+    }
+  ],
+  "pat_Name": "Test Adult",
+  "patGender": "F",
+  "patAge": "40 Yr",
+  "strDrugAllergy": [
+    {
+      "strAllergyName": "Penicillin;",
+      "strAllergySytmptomsName": "Rash;"
+    }
+  ]
+}

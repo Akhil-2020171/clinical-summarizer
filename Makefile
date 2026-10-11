@@ -2,8 +2,8 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
 # ---- Settings (override on the command line: make up MODEL_FILE=...) ----
-MODEL_REPO ?= Qwen/Qwen2.5-3B-Instruct-GGUF
-MODEL_FILE ?= qwen2.5-3b-instruct-q4_k_m.gguf
+MODEL_REPO ?= Qwen/Qwen2.5-1.5B-Instruct-GGUF
+MODEL_FILE ?= qwen2.5-1.5b-instruct-q4_k_m.gguf
 MODEL_URL  ?= https://huggingface.co/$(MODEL_REPO)/resolve/main/$(MODEL_FILE)
 API_PORT   ?= 8000
 LLAMA_HOST_PORT ?= 8081
@@ -96,3 +96,6 @@ shell: ## Open a shell inside the API container
 
 clean: ## Remove containers and the locally built API image (keeps models/)
 	$(COMPOSE) down --rmi local --remove-orphans
+
+batch: ## Run every samples/cases/*.json and report model vs template + timings
+	@python3 scripts/batch_test.py samples/cases

@@ -1,0 +1,30 @@
+{
+  "CC": [
+    {
+      "RN": "Fever",
+      "DU": "2 days"
+    },
+    {
+      "RN": "Poor feeding",
+      "DU": "1 day"
+    }
+  ],
+  "DIAG": {
+    "DG": [
+      {
+        "Name": "Viral fever"
+      }
+    ]
+  },
+  "DRUG": [
+    {
+      "DRN": "PARACETAMOL DROPS 125MG/5ML [ 201 ]",
+      "DSN": "2.5 ml",
+      "FRQ": "TDS",
+      "DYS": "3"
+    }
+  ],
+  "pat_Name": "Test Infant",
+  "patGender": "F",
+  "patAge": "4 Months"
+}

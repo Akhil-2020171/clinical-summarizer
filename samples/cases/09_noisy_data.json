@@ -1,0 +1,48 @@
+{
+  "CC": [
+    {
+      "RN": "  Fever  ",
+      "DU": "null"
+    },
+    {
+      "RN": "N/A"
+    },
+    {
+      "RN": "Headache",
+      "DU": "1 day"
+    }
+  ],
+  "HOPI": "null",
+  "DIAG": {
+    "DG": [
+      {
+        "Name": "Viral fever "
+      },
+      {
+        "Name": "viral fever"
+      }
+    ],
+    "DGNOTE": "none"
+  },
+  "INV": [
+    {
+      "TN": "Plain X RAY Chest(X )"
+    },
+    {
+      "TN": ""
+    }
+  ],
+  "DRUG": [
+    {
+      "DRN": "  PARACETAMOL TAB 500MG [ 701 ]  ",
+      "DSN": "N/A"
+    },
+    {
+      "DRN": null
+    }
+  ],
+  "strotherAllergies": "null",
+  "pat_Name": "Test Noisy",
+  "patGender": "M",
+  "patAge": "7 Yr"
+}

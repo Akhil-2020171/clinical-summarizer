@@ -51,6 +51,20 @@ def _drug(raw) -> str | None:
     return text.lower().capitalize() if text else None
 
 
+def _dose_in_name(dose: str, name: str) -> bool:
+    """True if the dose (e.g. '10 mg') already appears in the drug name."""
+    d = re.sub(r"\s+", "", dose.lower())
+    n = re.sub(r"\s+", "", name.lower())
+    return bool(re.search(r"(?<![\d.])" + re.escape(d) + r"(?!\w)", n))
+
+
+def _lower_first(text: str) -> str:
+    """'Fever for 2 days' -> 'fever for 2 days'; leaves 'COPD' and 'Vomit pH' alone."""
+    if len(text) > 1 and text[1:] == text[1:].lower():
+        return text[0].lower() + text[1:]
+    return text
+
+
 def _dedupe(items: list[str]) -> list[str]:
     seen: set[str] = set()
     out: list[str] = []
@@ -97,9 +111,11 @@ class BriefFacts:
         who = f"A {self.age_sex}" if self.age_sex else "The patient"
 
         if self.complaints:
-            sentences.append(
-                f"{who} presented with {', '.join(self.complaints)}."
-            )
+            complaints = [_lower_first(c) for c in self.complaints]
+            # If any complaint has its own duration, separate with ';' so a
+            # duration cannot read as applying to the whole list.
+            sep = "; " if any(" for " in c for c in complaints) else ", "
+            sentences.append(f"{who} presented with {sep.join(complaints)}.")
         elif self.age_sex:
             sentences.append(f"{who} patient was seen.")
 
@@ -177,7 +193,7 @@ def build_brief_facts(request: OPDPrescriptionRequest) -> BriefFacts:
         dose = _clean(medication.dose)
         frequency = _clean(medication.frequency)
         days = _clean(medication.duration_days)
-        if dose:
+        if dose and not _dose_in_name(dose, name):
             parts.append(dose)
         if frequency:
             parts.append(frequency)

@@ -62,7 +62,10 @@ clinical-summariser/                 <- run everything from here
 ├── models/                          GGUF model files (created by `make setup`)
 ├── samples/
 │   ├── sample.json                  clean example (LLM summary expected)
-│   └── sample_fallback.json         diagnosis the model alters (template expected)
+│   ├── sample_fallback.json         diagnosis the model alters (template expected)
+│   └── cases/                       11 varied prescriptions for `make batch`
+├── scripts/
+│   └── batch_test.py                posts every case and reports model vs template
 └── opd-rx-summary-generator/        the API
     ├── Dockerfile
     ├── .dockerignore
@@ -158,7 +161,18 @@ Response shape:
 }
 ```
 
-The response does not say whether `summary` came from the model or the template. Check
+The response body does not say whether `summary` came from the model or the template, but
+the **`X-Summary-Source` response header** does:
+
+| Header value | Meaning |
+|---|---|
+| `llm` | The model's summary passed validation |
+| `template:rejected` | The model answered but validation failed |
+| `template:error` | The model server was unreachable, timed out or errored |
+| `template:disabled` | `ENABLE_QWEN_SUMMARIZER=false` |
+| `template:no-facts` | Nothing usable in the request (no complaints, diagnoses or medications) |
+
+See it with `curl -i -X POST ... | grep -i x-summary-source`. For the exact reasons, check
 the API log (`make logs-api`) for one of:
 
 | Log line | Meaning |
@@ -169,6 +183,30 @@ the API log (`make logs-api`) for one of:
 
 A summary written like "Diagnosis: X. Investigations ordered: ..." (capitalised lists)
 is the template; flowing prose is the model.
+
+---
+
+## Batch testing
+
+`samples/cases/` holds 11 prescriptions chosen to be awkward: an infant (`4 Months`), an
+empty visit, no medications, five medications, an allergy with no symptoms, abbreviations,
+a procedure plus referral, messy data (`null`, `N/A`, duplicate entries) and a diagnosis the
+model tends to "correct".
+
+```bash
+make batch
+```
+
+It sends a warm-up request first (not counted), then every case, and prints each summary with
+who wrote it and how long it took, followed by totals and the model acceptance rate. Cases
+`04_empty_visit` and `10_diagnosis_typo_expect_template` are *expected* to use the template.
+Use it to compare models or prompts: run it, change `MODEL_FILE`, run it again.
+
+Run it directly with `python3 scripts/batch_test.py samples/cases --url http://localhost:8000`
+(standard library only; `--no-warmup` skips the warm-up request).
+
+Add your own cases by dropping more `.json` files into `samples/cases/`. Add one whenever a
+bad summary slips through.
 
 ---
 
@@ -191,6 +229,7 @@ Run `make` or `make help` for the live list.
 | `make test` | POST `samples/sample.json`, print the full response |
 | `make summary` | Same, print only the summary and the request time |
 | `make test-fallback` | POST a diagnosis the model will alter; expect the template |
+| `make batch` | Run every case in `samples/cases/`, report model vs template and timings |
 | `make shell` | Shell inside the API container |
 | `make clean` | Remove containers and the built API image (keeps `models/`) |
 
@@ -208,6 +247,7 @@ Run `make` or `make help` for the live list.
 | `LLAMA_CTX` | `4096` | compose | Context size |
 | `LLAMA_TIMEOUT` | `120` | API | Seconds to wait for the model before falling back |
 | `ENABLE_QWEN_SUMMARIZER` | `true` | API | `false` = always return the template summary |
+| `LOG_REJECTED_TEXT` | `false` | API | `true` = also log the model's text when the validator rejects it (development only: it contains patient information). `make batch` then prints it under each rejected case |
 | `LLAMA_SERVER_URL` | `http://llama:8080` | API | Set by compose; change only when running outside Docker |
 
 How to set them:

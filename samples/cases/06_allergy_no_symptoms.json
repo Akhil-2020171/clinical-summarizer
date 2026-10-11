@@ -1,0 +1,31 @@
+{
+  "CC": [
+    {
+      "RN": "Itchy rash",
+      "DU": "3 days"
+    }
+  ],
+  "DIAG": {
+    "DG": [
+      {
+        "Name": "Allergic dermatitis"
+      }
+    ]
+  },
+  "DRUG": [
+    {
+      "DRN": "CETIRIZINE TAB 10MG [ 401 ]",
+      "DSN": "10 mg",
+      "FRQ": "OD",
+      "DYS": "5"
+    }
+  ],
+  "strDrugAllergy": [
+    {
+      "strAllergyName": "Sulfonamides;"
+    }
+  ],
+  "pat_Name": "Test Allergy",
+  "patGender": "F",
+  "patAge": "28 Yr"
+}

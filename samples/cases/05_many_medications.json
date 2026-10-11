@@ -1,0 +1,70 @@
+{
+  "CC": [
+    {
+      "RN": "Giddiness",
+      "DU": "1 week"
+    }
+  ],
+  "DIAG": {
+    "DG": [
+      {
+        "Name": "Type 2 diabetes mellitus"
+      },
+      {
+        "Name": "Hypertension"
+      }
+    ]
+  },
+  "INV": [
+    {
+      "TN": "HbA1c"
+    },
+    {
+      "TN": "Lipid profile"
+    },
+    {
+      "TN": "Serum creatinine"
+    }
+  ],
+  "DRUG": [
+    {
+      "DRN": "METFORMIN TAB 500MG [ 301 ]",
+      "DSN": "500 mg",
+      "FRQ": "BD",
+      "DYS": "30"
+    },
+    {
+      "DRN": "GLIMEPIRIDE TAB 1MG [ 302 ]",
+      "DSN": "1 mg",
+      "FRQ": "OD",
+      "DYS": "30"
+    },
+    {
+      "DRN": "AMLODIPINE TAB 5MG [ 303 ]",
+      "DSN": "5 mg",
+      "FRQ": "OD",
+      "DYS": "30"
+    },
+    {
+      "DRN": "ATORVASTATIN TAB 10MG [ 304 ]",
+      "DSN": "10 mg",
+      "FRQ": "HS",
+      "DYS": "30"
+    },
+    {
+      "DRN": "ASPIRIN TAB 75MG [ 305 ]",
+      "DSN": "75 mg",
+      "FRQ": "OD",
+      "DYS": "30"
+    }
+  ],
+  "FUP": [
+    {
+      "NOTE": "Review with reports.",
+      "DATE": "11-11-2026"
+    }
+  ],
+  "pat_Name": "Test Many",
+  "patGender": "M",
+  "patAge": "62 Yr"
+}

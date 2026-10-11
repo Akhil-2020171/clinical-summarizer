@@ -1,0 +1,41 @@
+{
+  "CC": [
+    {
+      "RN": "Sore throat",
+      "DU": "4 days"
+    },
+    {
+      "RN": "Body ache",
+      "DU": "2 days"
+    }
+  ],
+  "DIAG": {
+    "DG": [
+      {
+        "Name": "URTI"
+      },
+      {
+        "Name": "? Dengue"
+      }
+    ]
+  },
+  "INV": [
+    {
+      "TN": "CBC"
+    },
+    {
+      "TN": "NS1 antigen"
+    }
+  ],
+  "DRUG": [
+    {
+      "DRN": "PARACETAMOL TAB 500MG [ 501 ]",
+      "DSN": "500 mg",
+      "FRQ": "TDS",
+      "DYS": "3"
+    }
+  ],
+  "pat_Name": "Test Abbrev",
+  "patGender": "M",
+  "patAge": "19 Yr"
+}
