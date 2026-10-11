@@ -1,0 +1,16 @@
+# Ignore virtual environments
+.venv/
+**/ .venv/
+
+# Ignore Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# Ignore pytest cache
+.pytest_cache/
+**/.pytest_cache/
+
+# Ignore models folder
+models/
+**/models/
