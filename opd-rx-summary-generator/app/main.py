@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 
 from fastapi import FastAPI
 
@@ -9,15 +10,32 @@ from app.schemas.response import (
     MedicationSummary,
     OPDPrescriptionResponse,
 )
-from app.services.deterministic_summary import (
-    build_deterministic_summary,
-)
-from app.services.fact_extractor import (
-    _clean,
-    extract_clinical_facts,
-)
+from app.services.brief_facts import build_brief_facts
+from app.services.fact_extractor import _clean
 from app.services.summarizer import ClinicalSummarizer
-# from app.services.summary_validator import validate_summary
+from app.services.summary_validator import validate_brief_summary
+
+
+_YES_NO = {"1": "Yes", "0": "No"}
+
+
+def _text(value):
+    """Clean a value: placeholders removed, spaces collapsed, stray ; , trimmed."""
+    cleaned = _clean(value)
+    if not cleaned:
+        return None
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" ;,")
+    return cleaned or None
+
+
+def _name(value):
+    """Clean a name: also drop codes like '[ 733 ]' and empty brackets like '(X )'."""
+    cleaned = _clean(value)
+    if not cleaned:
+        return None
+    cleaned = re.sub(r"\[[^\]]*\]", "", cleaned)
+    cleaned = re.sub(r"\(\s*[A-Za-z]?\s*\)", "", cleaned)
+    return _text(cleaned)
 
 
 logger = logging.getLogger(__name__)
@@ -43,7 +61,7 @@ app = FastAPI(
 
 
 def get_summarizer() -> ClinicalSummarizer:
-    """Load the summarizer lazily so the API can start without the model."""
+    """Create the llama-server client lazily."""
     global _summarizer
 
     if _summarizer is None:
@@ -55,34 +73,30 @@ def get_summarizer() -> ClinicalSummarizer:
 def generate_summary(
     request: OPDPrescriptionRequest,
 ) -> str:
-    """Generate a Qwen summary, falling back on failure."""
-    fallback_summary = build_deterministic_summary(request)
+    """LLM summary, validated; falls back to a template summary."""
+    facts = build_brief_facts(request)
+    fallback = facts.to_template_summary()
 
-    if not ENABLE_QWEN_SUMMARIZER:
-        return fallback_summary
+    if not ENABLE_QWEN_SUMMARIZER or facts.is_empty():
+        return fallback
 
     try:
-        clinical_facts = extract_clinical_facts(request)
+        candidate = get_summarizer().summarize(facts.to_prompt())
+        problems = validate_brief_summary(facts, candidate)
 
-        if not clinical_facts or not clinical_facts.strip():
-            logger.warning("No clinical facts available; using deterministic summary.")
-            return fallback_summary
+        if not problems:
+            logger.info("LLM summary accepted.")
+            return candidate
 
-        candidate_summary = get_summarizer().summarize(clinical_facts)
-
-        if candidate_summary and candidate_summary.strip():
-            logger.info("Qwen summary generated successfully.")
-            return candidate_summary.strip()
-
-        logger.warning("Qwen returned an empty summary; using deterministic fallback.")
+        logger.warning("LLM summary rejected: %s", problems)
 
     except Exception as exc:
         logger.warning(
-            "Qwen generation failed (%s); using deterministic fallback.",
+            "LLM generation failed (%s); using template summary.",
             type(exc).__name__,
         )
 
-    return fallback_summary
+    return fallback
 
 
 def build_sections(
@@ -94,8 +108,8 @@ def build_sections(
     chief_complaints = []
 
     for complaint in request.chief_complaints or []:
-        name = _clean(complaint.name)
-        duration = _clean(complaint.duration)
+        name = _name(complaint.name)
+        duration = _text(complaint.duration)
 
         if not name:
             continue
@@ -110,7 +124,7 @@ def build_sections(
 
     if request.diagnosis:
         for item in request.diagnosis.items or []:
-            name = _clean(item.name)
+            name = _name(item.name)
             if name and name not in diagnoses:
                 diagnoses.append(name)
 
@@ -119,7 +133,7 @@ def build_sections(
             request.diagnosis.remarks,
             request.diagnosis_note,
         ):
-            value = _clean(note)
+            value = _text(note)
             if value:
                 diagnoses.append(value)
 
@@ -127,15 +141,15 @@ def build_sections(
     investigations = []
 
     for item in request.investigations or []:
-        name = _clean(item.name)
-        remarks = _clean(item.remarks)
+        name = _name(item.name)
+        remarks = _text(item.remarks)
 
         if name:
             value = f"{name} — {remarks}" if remarks else name
             investigations.append(value)
 
     if request.investigation_note:
-        note = _clean(request.investigation_note)
+        note = _text(request.investigation_note)
         if note:
             investigations.append(note)
 
@@ -143,18 +157,18 @@ def build_sections(
     medications = []
 
     for item in request.medications or []:
-        name = _clean(item.name)
+        name = _name(item.name)
         if not name:
             continue
 
         medications.append(
             MedicationSummary(
                 name=name,
-                dose=_clean(item.dose),
-                frequency=_clean(item.frequency),
-                duration=_clean(item.duration_days),
-                quantity=_clean(item.quantity),
-                instructions=_clean(item.instructions),
+                dose=_text(item.dose),
+                frequency=_text(item.frequency),
+                duration=_text(item.duration_days),
+                quantity=_text(item.quantity),
+                instructions=_text(item.instructions),
             )
         )
 
@@ -162,7 +176,7 @@ def build_sections(
     procedures = [
         name
         for item in request.clinical_procedures or []
-        if (name := _clean(item.name))
+        if (name := _name(item.name))
     ]
 
     # Referrals
@@ -170,9 +184,9 @@ def build_sections(
 
     for item in request.referrals or []:
         details = [
-            _clean(item.department),
-            _clean(item.referral_type),
-            _clean(item.reason),
+            _name(item.department),
+            _text(item.referral_type),
+            _text(item.reason),
         ]
         details = [value for value in details if value]
 
@@ -183,11 +197,11 @@ def build_sections(
     follow_up_items = []
 
     for item in request.follow_ups or []:
-        note = _clean(item.note)
-        date = _clean(item.date)
+        note = _text(item.note)
+        date = _text(item.date)
 
         if note:
-            follow_up_items.append(note)
+            follow_up_items.append(note.rstrip("."))
         if date:
             follow_up_items.append(f"Date: {date}")
 
@@ -205,18 +219,18 @@ def build_sections(
             ("Treatment history", history.treatment_history),
             ("Surgical history", history.surgical_history),
         ):
-            cleaned = _clean(value)
+            cleaned = _text(value)
             if cleaned:
                 relevant_history.append(f"{label}: {cleaned}")
 
     for item in request.chronic_diseases or []:
-        name = _clean(item.name)
+        name = _name(item.name)
         if not name:
             continue
 
         details = [name]
-        duration = _clean(item.duration)
-        remarks = _clean(item.remarks)
+        duration = _text(item.duration)
+        remarks = _text(item.remarks)
 
         if duration:
             details.append(f"Duration: {duration}")
@@ -239,7 +253,7 @@ def build_sections(
             ("Musculoskeletal", examination.musculoskeletal),
             ("Local examination", examination.local_examination),
         ):
-            cleaned = _clean(value)
+            cleaned = _text(value)
             if cleaned:
                 examination_findings.append(f"{label}: {cleaned}")
 
@@ -254,7 +268,8 @@ def build_sections(
             ("Lymphadenopathy", signs.lymphadenopathy),
             ("Edema", signs.edema),
         ):
-            cleaned = _clean(value)
+            cleaned = _text(value)
+            cleaned = _YES_NO.get(cleaned, cleaned)
             if cleaned:
                 examination_findings.append(f"{label}: {cleaned}")
 
@@ -263,25 +278,25 @@ def build_sections(
 
     for item in request.drug_allergies or []:
         details = [
-            _clean(item.sensitivity_type),
-            _clean(item.allergy_name),
-            _clean(item.site),
-            _clean(item.symptoms),
-            _clean(item.remarks),
-            _clean(item.duration),
+            _text(item.sensitivity_type),
+            _text(item.allergy_name),
+            _text(item.site),
+            _text(item.symptoms),
+            _text(item.remarks),
+            _text(item.duration),
         ]
         details = [value for value in details if value]
 
         if details:
             allergies.append("; ".join(details))
 
-    other_allergies = _clean(request.other_allergies)
+    other_allergies = _text(request.other_allergies)
     if other_allergies:
         allergies.append(other_allergies)
 
     # History of present illness and treatment advice
-    hopi = _clean(request.history_of_present_illness)
-    treatment_advice = _clean(request.treatment_advice)
+    hopi = _text(request.history_of_present_illness)
+    treatment_advice = _text(request.treatment_advice)
 
     return ClinicalSections(
         chief_complaints=chief_complaints,

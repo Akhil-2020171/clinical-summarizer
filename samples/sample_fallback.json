@@ -1,0 +1,72 @@
+{
+  "CC": [{"RN": "Fever"}, {"RN": "Headache"}, {"RN": "Vomit pH"}],
+  "HOPI": "",
+  "DIAG": {"DG": [{"Name": "Malaria"}, {"Name": "Malt fever"}], "DGNOTE": ""},
+  "INV": [
+    {"TN": "Complete Blood Count"},
+    {"TN": "Liver Function Test"},
+    {"TN": "Plain X RAY Abdomen"},
+    {"TN": "Plain X RAY Chest(X )"}
+  ],
+  "DRUG": [
+    {"DRN": "PARACETAMOL TAB 125MG [ 733 ] "},
+    {"DRN": "AMOXICILLIN AND POTASSIUM CLAVULANATE INJ IP 500MG [ 770 ] "}
+  ],
+  "FUP": [
+    {
+      "IsEnd": "0",
+      "NOTE": "The patient needs to visit on the provided following date with the CBC and Chest X-Ray reports, mandatorily.",
+      "DATE": "12-10-2026"
+    }
+  ],
+  "clinicalproc": [{"procname": "Hydrogen Breath Test "}],
+  "strReferal": [{"referdeptname": "Cardiology"}],
+  "pat_Name": "Kanhai",
+  "currentVisitDate": "2026-10-10T14:49:50.893Z",
+  "lastVisitDate": "2026-06-07T18:30:00.000+0000",
+  "patGender": "M",
+  "patAge": "26 Yr",
+  "patCat": "GEN",
+  "patConsultantName": "Dr N Kalaisezhian",
+  "patDept": "General Medicine/Male O P",
+  "strCompleteHistory": {
+    "strpastHistory": "The patient has been suffering from synus infection",
+    "strpersonalHistory": "Junk food eating",
+    "strfamilyHistory": "Everything seems good",
+    "strtreatmentHistory": "fever and chest pain medications",
+    "strsurgicalHistory": "No"
+  },
+  "strSystematicExamniation": {
+    "strcvs": "Something CVS",
+    "strrs": "Something RS",
+    "strcns": "Something CNS",
+    "strpA": "Something P/A",
+    "strotherExamn": "Vitals are being captured",
+    "strmuscularExamn": "Muscular weight reduction",
+    "strLocalExamn": "Sleep scheduled ruptured"
+  },
+  "strChronicDisease": [{"CronicDiseaseName": "Asthma-COPD overlap syndrome (ACOS);"}],
+  "strDiagnosisNote": "",
+  "strDrugAllergy": [
+    {
+      "strSensivityName": "Type 2",
+      "strAllergyName": "Non-allergic anaphylaxis caused by parasympathomimetic agent;",
+      "strAllergysiteName": "Mouth;",
+      "strAllergySytmptomsName": "Coughing;",
+      "strAllergyRemarks": "Drink Water",
+      "stDurationTime": "4"
+    }
+  ],
+  "strInvestgationNote": "",
+  "strotherAllergies": "",
+  "strtreatmentAdvice": "Acidic substance are prohibited until the patient starts feeling well.",
+  "strVitalsChart": "Weight : 62.00KG, Height : 171.00CM, BMI : 21.20KG/m2, BP : 120.0/80.0mmHg, GRBS : 95.00mg/dL, Temperature : 98.0F, Respiration Rate : 15breaths/min, SPO2 : 98%, BSA : 1.72m2, Pulse Rate : 45be/m, Remarks : These are essential values.",
+  "strpiccle": {
+    "strpallor": "1",
+    "stricterus": "0",
+    "strcyanosis": "1",
+    "strclubbing": "0",
+    "striymphadenopathyId": "1",
+    "stredema": "0"
+  }
+}

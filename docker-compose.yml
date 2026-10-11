@@ -1,0 +1,35 @@
+services:
+  # Local LLM server (llama.cpp, OpenAI-compatible API). CPU only.
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: opd-llama
+    restart: unless-stopped
+    command: >
+      -m /models/${MODEL_FILE:-qwen2.5-3b-instruct-q4_k_m.gguf}
+      -c ${LLAMA_CTX:-4096}
+      -t ${LLAMA_THREADS:-4}
+      --host 0.0.0.0
+      --port 8080
+    volumes:
+      - ./models:/models:ro
+    ports:
+      # Bound to localhost only; handy for debugging with curl.
+      - "127.0.0.1:${LLAMA_HOST_PORT:-8081}:8080"
+
+  # FastAPI service that cleans the data, calls the LLM, validates, and falls back.
+  api:
+    build:
+      context: ./opd-rx-summary-generator
+    image: opd-rx-summary-generator:latest
+    container_name: opd-api
+    restart: unless-stopped
+    environment:
+      LLAMA_SERVER_URL: http://llama:8080
+      LLAMA_TIMEOUT: ${LLAMA_TIMEOUT:-120}
+      ENABLE_QWEN_SUMMARIZER: ${ENABLE_QWEN_SUMMARIZER:-true}
+    depends_on:
+      # "started", not "healthy": if the model is missing or still loading,
+      # the API still serves the template (fallback) summary.
+      - llama
+    ports:
+      - "${API_PORT:-8000}:8000"
