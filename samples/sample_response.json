@@ -1,0 +1,74 @@
+{
+  "patient_name": "Kanhai",
+  "summary": "A 26-year-old male presented with fever, headache, and vomiting. Diagnosed with malaria and typhoid fever; ordered complete blood count, liver function test, plain x-ray abdomen, plain x-ray chest, and hydrogen breath test. Referral to cardiology. Prescribed paracetamol tab 125 mg, amoxicillin and potassium clavulanate inj ip 500 mg. Drug allergy: non-allergic anaphylaxis caused by parasympathomimetic agent (coughing). Follow-up on 12-10-2026 with CBC and Chest X-Ray reports mandatory.",
+  "sections": {
+    "chief_complaints": [
+      "Fever",
+      "Headache",
+      "Vomit pH"
+    ],
+    "history_of_present_illness": null,
+    "diagnoses": [
+      "Malaria",
+      "Typhoid fever"
+    ],
+    "investigations": [
+      "Complete Blood Count",
+      "Liver Function Test",
+      "Plain X RAY Abdomen",
+      "Plain X RAY Chest"
+    ],
+    "medications": [
+      {
+        "name": "PARACETAMOL TAB 125MG",
+        "dose": null,
+        "frequency": null,
+        "duration": null,
+        "quantity": null,
+        "instructions": null
+      },
+      {
+        "name": "AMOXICILLIN AND POTASSIUM CLAVULANATE INJ IP 500MG",
+        "dose": null,
+        "frequency": null,
+        "duration": null,
+        "quantity": null,
+        "instructions": null
+      }
+    ],
+    "procedures": [
+      "Hydrogen Breath Test"
+    ],
+    "referrals": [
+      "Cardiology"
+    ],
+    "follow_up": "The patient needs to visit on the provided following date with the CBC and Chest X-Ray reports, mandatorily; Date: 12-10-2026",
+    "relevant_history": [
+      "Past history: The patient has been suffering from synus infection",
+      "Personal history: Junk food eating",
+      "Family history: Everything seems good",
+      "Treatment history: fever and chest pain medications",
+      "Surgical history: No",
+      "Asthma-COPD overlap syndrome (ACOS)"
+    ],
+    "examination_findings": [
+      "Cardiovascular: Something CVS",
+      "Respiratory: Something RS",
+      "Central nervous system: Something CNS",
+      "Abdomen: Something P/A",
+      "Other examination: Vitals are being captured",
+      "Musculoskeletal: Muscular weight reduction",
+      "Local examination: Sleep scheduled ruptured",
+      "Pallor: Yes",
+      "Icterus: No",
+      "Cyanosis: Yes",
+      "Clubbing: No",
+      "Lymphadenopathy: Yes",
+      "Edema: No"
+    ],
+    "allergies": [
+      "Type 2; Non-allergic anaphylaxis caused by parasympathomimetic agent; Mouth; Coughing; Drink Water; 4"
+    ],
+    "treatment_advice": "Acidic substance are prohibited until the patient starts feeling well."
+  }
+}
